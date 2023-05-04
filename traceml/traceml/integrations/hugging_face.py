@@ -38,7 +38,7 @@ class Callback(TrainerCallback):
         summary, filetype = events_processors.model_to_str(model)
         if not summary:
             return
-        rel_path = self.run.get_outputs_path("model_summary.{}".format(filetype))
+        rel_path = self.run.get_outputs_path(f"model_summary.{filetype}")
         with open(rel_path, "w") as f:
             f.write(summary)
         self.run.log_file_ref(path=rel_path, name="model_summary", is_input=False)

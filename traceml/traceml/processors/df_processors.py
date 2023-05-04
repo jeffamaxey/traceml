@@ -46,7 +46,7 @@ ALL = "all"
 
 def df_has_column(df: pd.DataFrame, column: Union[int, str]):
     if not isinstance(column, (int, str)):
-        raise ValueError("{} is not a valid column".format(column))
+        raise ValueError(f"{column} is not a valid column")
     return column in df.columns
 
 
@@ -91,7 +91,7 @@ def get_df_columns(
 
 
 def get_df_uniques(df: pd.DataFrame):
-    return pd.Series(dict((c, df[c].nunique()) for c in df.columns), name="uniques")
+    return pd.Series({c: df[c].nunique() for c in df.columns}, name="uniques")
 
 
 def get_df_missing(df: pd.DataFrame, df_length: int = None, df_counts: int = None):
@@ -216,7 +216,7 @@ def get_top_correlations_description(
         df=df, column=column, threshold=threshold, top=top, df_corr=df_corr
     )
     return ", ".join(
-        "{}: {}".format(col, to_percentage(val)) for col, val in correlations.items()
+        f"{col}: {to_percentage(val)}" for col, val in correlations.items()
     )
 
 
@@ -295,14 +295,12 @@ def get_categorical_summary(
     series = df[column]
     # Only run if at least 1 non-missing value
     value_counts = series.value_counts()
-    stats = {
-        "top": "{}: {}".format(value_counts.index[0], value_counts.iloc[0]),
-    }
+    stats = {"top": f"{value_counts.index[0]}: {value_counts.iloc[0]}"}
     return pd.concat([pd.Series(stats, name=column), columns_stats[column]], sort=True)
 
 
 def get_constant_summary(df: pd.DataFrame, column: str):
-    return "This is a constant value: {}".format(df[column][0])
+    return f"This is a constant value: {df[column][0]}"
 
 
 def get_bool_summary(
@@ -321,10 +319,8 @@ def get_bool_summary(
 
     stats = {}
     for class_name, class_value in sorted(dict(series.value_counts()).items()):
-        stats['"{}" count'.format(class_name)] = "{}".format(class_value)
-        stats['"{}" perc'.format(class_name)] = "{}".format(
-            to_percentage(class_value / df_length)
-        )
+        stats[f'"{class_name}" count'] = f"{class_value}"
+        stats[f'"{class_name}" perc'] = f"{to_percentage(class_value / df_length)}"
 
     return pd.concat([pd.Series(stats, name=column), columns_stats[column]], sort=True)
 

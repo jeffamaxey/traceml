@@ -483,9 +483,7 @@ class V1Events:
         elif isinstance(data, dict):
             df = pd.DataFrame.from_dict(data)
         else:
-            raise ValueError(
-                "V1Events received an unsupported value type: {}".format(type(data))
-            )
+            raise ValueError(f"V1Events received an unsupported value type: {type(data)}")
 
         return cls(name=name, kind=kind, df=df)
 
@@ -523,12 +521,10 @@ class V1Events:
 
     def get_summary(self) -> Dict:
         summary = {"is_event": True}
-        step_summary = self._get_step_summary()
-        if step_summary:
+        if step_summary := self._get_step_summary():
             summary["step"] = step_summary
 
-        ts_summary = self._get_ts_summary()
-        if ts_summary:
+        if ts_summary := self._get_ts_summary():
             summary["timestamp"] = ts_summary
 
         if self.kind == V1ArtifactKind.METRIC:
@@ -550,7 +546,7 @@ class LoggedEventListSpec(namedtuple("LoggedEventListSpec", "name kind events"))
         return V1Event.SEPARATOR.join(["step", "timestamp", self.kind])
 
     def get_csv_events(self) -> str:
-        events = ["\n{}".format(e.to_csv()) for e in self.events]
+        events = [f"\n{e.to_csv()}" for e in self.events]
         return "".join(events)
 
     def empty_events(self):

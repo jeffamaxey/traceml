@@ -127,7 +127,7 @@ class TestRunTracking(TestEnvVarsCase):
 
     def test_dict_run_info(self):
         uid = uuid.uuid4().hex
-        run_info = "user.project_bar.runs.{}".format(uid)
+        run_info = f"user.project_bar.runs.{uid}"
         self.check_valid_value(
             POLYAXON_KEYS_RUN_INSTANCE,
             get_run_info,
@@ -724,7 +724,7 @@ class TestRunLogging(TestEnvVarsCase):
         figures = []
         for i in range(5):
             figure = plt.figure()
-            plt.plot([i * 1, i * 2, i * 3], label="Plot " + str(i))
+            plt.plot([i * 1, i * 2, i * 3], label=f"Plot {str(i)}")
             plt.xlabel("X")
             plt.xlabel("Y")
             plt.legend()
@@ -734,7 +734,7 @@ class TestRunLogging(TestEnvVarsCase):
         with patch("traceml.tracking.run.Run._log_has_events") as log_mpl_image:
             self.run.log_mpl_image(name="figure", data=figures, step=1, close=False)
         assert log_mpl_image.call_count == 1
-        assert all([plt.fignum_exists(figure.number) is True for figure in figures])
+        assert all(plt.fignum_exists(figure.number) is True for figure in figures)
 
         self.event_logger.flush()
         assert (
@@ -755,7 +755,7 @@ class TestRunLogging(TestEnvVarsCase):
         with patch("traceml.tracking.run.Run._log_has_events") as log_mpl_image:
             self.run.log_mpl_image(name="figure", data=figures, step=2)
         assert log_mpl_image.call_count == 1
-        assert all([plt.fignum_exists(figure.number) is False for figure in figures])
+        assert all(plt.fignum_exists(figure.number) is False for figure in figures)
 
         self.event_logger.flush()
         assert (
@@ -1165,9 +1165,7 @@ class TestRunLogging(TestEnvVarsCase):
             is False
         )
         assert os.path.exists(self.run.get_outputs_path(V1ArtifactKind.MODEL)) is True
-        model_file = self.run.get_outputs_path(
-            "{}/{}".format(V1ArtifactKind.MODEL, "model.pkl")
-        )
+        model_file = self.run.get_outputs_path(f"{V1ArtifactKind.MODEL}/model.pkl")
         assert os.path.exists(model_file) is True
 
     def test_log_versioned_model_file(self):

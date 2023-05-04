@@ -45,7 +45,7 @@ def get_logs_streamer(
                 color = colors[0]
                 colors.rotate(-1)
                 job_to_color[container_info] = color
-            return Printer.add_color(container_info, color) + " | "
+            return f"{Printer.add_color(container_info, color)} | "
 
         if not all_containers and log.container != MAIN_JOB_CONTAINER:
             return log_line

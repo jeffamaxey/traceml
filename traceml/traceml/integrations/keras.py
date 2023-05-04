@@ -59,27 +59,24 @@ class Callback(keras.callbacks.Callback):
 
         # From Keras
         if mode not in ["auto", "min", "max"]:
-            print(
-                "PolyaxonCallback mode %s is unknown, " "fallback to auto mode." % mode
-            )
+            print(f"PolyaxonCallback mode {mode} is unknown, fallback to auto mode.")
             mode = "auto"
 
-        if mode == "min":
+        if mode == "max":
+            self.monitor_op = operator.gt
+            self.best = float("-inf")
+        elif mode == "min":
             self.monitor_op = operator.lt
             self.best = float("inf")
-        elif mode == "max":
+        elif "acc" in self.monitor or self.monitor.startswith("fmeasure"):
             self.monitor_op = operator.gt
             self.best = float("-inf")
         else:
-            if "acc" in self.monitor or self.monitor.startswith("fmeasure"):
-                self.monitor_op = operator.gt
-                self.best = float("-inf")
-            else:
-                self.monitor_op = operator.lt
-                self.best = float("inf")
+            self.monitor_op = operator.lt
+            self.best = float("inf")
         # Get the previous best metric for resumed runs
         previous_best = (self.run.get_inputs() or {}).get(
-            "{}_{}".format(self.log_best_prefix, self.monitor)
+            f"{self.log_best_prefix}_{self.monitor}"
         )
         if previous_best is not None:
             self.best = previous_best
@@ -150,10 +147,8 @@ class Callback(keras.callbacks.Callback):
         self.current = logs.get(self.monitor)
         if self.current and self.monitor_op(self.current, self.best):
             if self.log_best_prefix:
-                metrics[
-                    "{}_{}".format(self.log_best_prefix, self.monitor)
-                ] = self.current
-                metrics["{}_{}".format(self.log_best_prefix, "epoch")] = epoch
+                metrics[f"{self.log_best_prefix}_{self.monitor}"] = self.current
+                metrics[f"{self.log_best_prefix}_epoch"] = epoch
             if self.log_model:
                 self._log_model()
             self.best = self.current
@@ -179,8 +174,6 @@ class Callback(keras.callbacks.Callback):
                 self.model.save(self.filepath, overwrite=True)
             if not self.run._has_meta_key("has_model"):  # noqa
                 self.run.log_model_ref(self.filepath, name="model", framework="keras")
-        # `RuntimeError: Unable to create link` in TF 1.13.1
-        # also saw `TypeError: can't pickle _thread.RLock objects`
         except (ImportError, RuntimeError, TypeError) as e:
-            logger.warning("Can't save model, h5py returned error: %s" % e)
+            logger.warning(f"Can't save model, h5py returned error: {e}")
             self.log_model = False

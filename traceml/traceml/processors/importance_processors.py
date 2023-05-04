@@ -54,28 +54,25 @@ def clean_values(
         r"^\s*$", np.nan, regex=True
     )
     for col in configs_df.columns:
-        if not configs_df[col].isnull().sum() == len(configs_df[col]):
-            if configs_df[col].dtype == "object":
-                configs_df[col].fillna("NAN", inplace=True)
-                configs_df[col].fillna("NAN", inplace=True)
-                configs_df[col] = configs_df[col].astype("category")
-            elif configs_df[col].dtype == "float64" or configs_df[col].dtype == "int64":
-                configs_df[col].fillna(configs_df[col].mean(), inplace=True)
-            else:
-                print("Unexpected Column type: {}".format(configs_df[col].dtype))
-        else:
+        if configs_df[col].isnull().sum() == len(configs_df[col]):
             if configs_df[col].dtype == "object":
                 configs_df[col] = "NAN"
-            elif configs_df[col].dtype == "float64" or configs_df[col].dtype == "int64":
+            elif configs_df[col].dtype in ["float64", "int64"]:
                 configs_df[col] = 0
 
+        elif configs_df[col].dtype == "object":
+            configs_df[col].fillna("NAN", inplace=True)
+            configs_df[col].fillna("NAN", inplace=True)
+            configs_df[col] = configs_df[col].astype("category")
+        elif configs_df[col].dtype in ["float64", "int64"]:
+            configs_df[col].fillna(configs_df[col].mean(), inplace=True)
+        else:
+            print(f"Unexpected Column type: {configs_df[col].dtype}")
     return clean_duplicates(metrics_df, configs_df)
 
 
 def _get_value(x):
-    if x is None or math.isnan(x):
-        return None
-    return round(sanitize_np_types(x), 3)
+    return None if x is None or math.isnan(x) else round(sanitize_np_types(x), 3)
 
 
 def calculate_importance(metrics: List[Union[int, float]], configs: List[Dict]):
@@ -92,10 +89,10 @@ def calculate_importance(metrics: List[Union[int, float]], configs: List[Dict]):
     forest.fit(configs_df, metrics_df[0])
     feature_importances = forest.feature_importances_
 
-    results = {}
-    for i, name in enumerate(configs_df.columns):
-        results[name] = {
+    return {
+        name: {
             "importance": _get_value(feature_importances[i]),
             "correlation": _get_value(corr_list[name]),
         }
-    return results
+        for i, name in enumerate(configs_df.columns)
+    }

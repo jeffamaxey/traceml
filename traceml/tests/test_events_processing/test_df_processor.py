@@ -61,7 +61,7 @@ class DataFrameSummaryTest(TestCase):
             dict(
                 dbool1=np.random.choice([0, 1], size=self.size),
                 dbool2=np.random.choice(["a", "b"], size=self.size),
-                duniques=["x{}".format(i) for i in range(self.size)],
+                duniques=[f"x{i}" for i in range(self.size)],
                 dcategoricals=[
                     "a".format(i)
                     if i % 2 == 0

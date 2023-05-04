@@ -23,7 +23,7 @@ def callback(run=None):
     def _callback(env):
         res = {}
         for data_name, eval_name, value, _ in env.evaluation_result_list:
-            key = data_name + "-" + eval_name
+            key = f"{data_name}-{eval_name}"
             res[key] = value
         run.log_metrics(step=env.iteration, **res)
 

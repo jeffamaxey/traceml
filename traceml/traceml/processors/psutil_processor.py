@@ -34,9 +34,6 @@ def query_psutil() -> Dict:
         # psutil <= 5.6.2 did not have getloadavg:
         if hasattr(psutil, "getloadavg"):
             results["load"] = psutil.getloadavg()[0]
-        else:
-            # Do not log an empty metric
-            pass
     except OSError:
         pass
     vm = psutil.virtual_memory()

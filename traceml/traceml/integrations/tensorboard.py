@@ -135,13 +135,11 @@ class Logger:
                     return
                 except ValueError:
                     logger.warning(
-                        "Ignoring histogram for tag `{}`, "
-                        "Histograms must have few bins".format(value.tag)
+                        f"Ignoring histogram for tag `{value.tag}`, Histograms must have few bins"
                     )
             else:
                 logger.warning(
-                    "Ignoring histogram for tag `{}`, "
-                    "Found a histogram with only 2 bins.".format(value.tag)
+                    f"Ignoring histogram for tag `{value.tag}`, Found a histogram with only 2 bins."
                 )
 
     @staticmethod

@@ -79,9 +79,7 @@ def np_histogram(values, counts, max_bins=None):
     counts_len = len(counts)
     if values_len > max_bins:
         raise ValueError(
-            "The maximum bins for a histogram is {}, received {}".format(
-                max_bins, values_len
-            )
+            f"The maximum bins for a histogram is {max_bins}, received {values_len}"
         )
     if values_len + 1 != counts_len:
         raise ValueError("len(hist.values) must be len(hist.counts) + 1")
@@ -177,27 +175,15 @@ def confusion_matrix(x, y, z):
         z_len = len(z)
         if x_len != y_len or x_len != z_len:
             raise ValueError(
-                "Received invalid data for confusion matrix. "
-                "All arrays must have the same structure: "
-                "[len(x): {}, len(y): {}, len(z): {}]".format(
-                    x_len,
-                    y_len,
-                    z_len,
-                )
+                f"Received invalid data for confusion matrix. All arrays must have the same structure: [len(x): {x_len}, len(y): {y_len}, len(z): {z_len}]"
             )
         zi_len = [len(zi) for zi in z]
         if len(set(zi_len)) != 1 or zi_len[0] != z_len:
             raise ValueError(
-                "Received invalid data for confusion matrix. "
-                "Current structure: [len(x): {}, len(y): {}, len(z): {}]. "
-                "The z array has different nested structures: {}".format(
-                    x_len, y_len, z_len, zi_len
-                )
+                f"Received invalid data for confusion matrix. Current structure: [len(x): {x_len}, len(y): {y_len}, len(z): {z_len}]. The z array has different nested structures: {zi_len}"
             )
     except Exception as e:  # noqa
-        raise ValueError(
-            "Received invalid data for confusion matrix. Error {}".format(e)
-        )
+        raise ValueError(f"Received invalid data for confusion matrix. Error {e}")
     return V1EventConfusionMatrix(
         x=x,
         y=y,
@@ -206,13 +192,11 @@ def confusion_matrix(x, y, z):
 
 
 def metrics_dict_to_list(metrics: Dict) -> List:
-    results = []
-    for k, v in metrics.items():
-        results.append(
-            LoggedEventSpec(
-                name=k,
-                kind=V1ArtifactKind.METRIC,
-                event=V1Event.make(metric=v),
-            )
+    return [
+        LoggedEventSpec(
+            name=k,
+            kind=V1ArtifactKind.METRIC,
+            event=V1Event.make(metric=v),
         )
-    return results
+        for k, v in metrics.items()
+    ]

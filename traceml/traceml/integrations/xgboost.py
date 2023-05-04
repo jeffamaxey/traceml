@@ -141,10 +141,10 @@ class Callback(xgb.callback.TrainingCallback):
             )
 
         if model_folds:
-            config = {}
-            for i, fold in enumerate(model_folds):
-                config["fold_{}_config".format(i)] = ujson.loads(fold.bst.save_config())
-            if config:
+            if config := {
+                f"fold_{i}_config": ujson.loads(fold.bst.save_config())
+                for i, fold in enumerate(model_folds)
+            }:
                 self.run.log_inputs(**config)
         else:
             self.run.log_inputs(config=ujson.loads(model.save_config()))
@@ -159,14 +159,14 @@ class Callback(xgb.callback.TrainingCallback):
 
     def after_iteration(self, model: Booster, epoch: int, evals_log: dict) -> bool:
         metrics = {}
-        for stage, metrics_dict in evals_log.items():
-            for metric_name, metric_values in evals_log[stage].items():
+        for stage, value in evals_log.items():
+            for metric_name, metric_values in value.items():
                 if _get_cv(model):
                     mean, std = metric_values[-1]
-                    metrics["{}-{}-mean".format(stage, metric_name)] = mean
-                    metrics["{}-{}-std".format(stage, metric_name)] = std
+                    metrics[f"{stage}-{metric_name}-mean"] = mean
+                    metrics[f"{stage}-{metric_name}-std"] = std
                 else:
-                    metrics["{}-{}".format(stage, metric_name)] = metric_values[-1]
+                    metrics[f"{stage}-{metric_name}"] = metric_values[-1]
 
         if metrics:
             self.run.log_metrics(step=epoch, **metrics)

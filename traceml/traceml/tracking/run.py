@@ -232,8 +232,7 @@ class Run(RunClient):
             self._event_logger.add_event(event)
         else:
             logger.warning(
-                "Could not log event {}, "
-                "the event logger was not configured properly".format(event.name)
+                f"Could not log event {event.name}, the event logger was not configured properly"
             )
 
     def _add_events(self, events: List[LoggedEventSpec]):
@@ -241,8 +240,7 @@ class Run(RunClient):
             self._event_logger.add_events(events)
         else:
             logger.warning(
-                "Could not log events {}, "
-                "the event logger was not configured properly".format(len(events))
+                f"Could not log events {len(events)}, the event logger was not configured properly"
             )
 
     def _persist_logs_history(self):
@@ -250,16 +248,12 @@ class Run(RunClient):
             logs_path = os.path.join(
                 self._artifacts_path,
                 "plxlogs",
-                "{}.plx".format(
-                    datetime.timestamp(self._logs_history.logs[-1].timestamp)
-                ),
+                f"{datetime.timestamp(self._logs_history.logs[-1].timestamp)}.plx",
             )
             check_or_create_path(logs_path, is_dir=False)
             with open(logs_path, "w") as logs_file:
                 logs_file.write(
-                    "{}\n{}".format(
-                        self._logs_history.get_csv_header(), self._logs_history.to_csv()
-                    )
+                    f"{self._logs_history.get_csv_header()}\n{self._logs_history.to_csv()}"
                 )
 
     def _add_logs(self, log: V1Log):
@@ -359,19 +353,14 @@ class Run(RunClient):
         Returns:
             str, outputs_path
         """
-        if use_store_path:
-            artifacts_path = self._get_store_path()
-            if artifacts_path:
-                outputs_path = (
-                    container_contexts.CONTEXTS_OUTPUTS_SUBPATH_FORMAT.format(
-                        artifacts_path
-                    )
+        if use_store_path and (artifacts_path := self._get_store_path()):
+            outputs_path = (
+                container_contexts.CONTEXTS_OUTPUTS_SUBPATH_FORMAT.format(
+                    artifacts_path
                 )
-            else:
-                outputs_path = self._outputs_path
+            )
         else:
             outputs_path = self._outputs_path
-
         if rel_path:
             path = os.path.join(outputs_path, rel_path)
             if ensure_path:
@@ -498,18 +487,18 @@ class Run(RunClient):
         name = to_fqn_name(name)
         self._log_has_metrics()
 
-        events = []
         event_value = events_processors.metric(value)
         if event_value == UNKNOWN:
             return
-        events.append(
+        if events := [
             LoggedEventSpec(
                 name=name,
                 kind=V1ArtifactKind.METRIC,
-                event=V1Event.make(timestamp=timestamp, step=step, metric=event_value),
+                event=V1Event.make(
+                    timestamp=timestamp, step=step, metric=event_value
+                ),
             )
-        )
-        if events:
+        ]:
             self._add_events(events)
             self._results[name] = event_value
 
@@ -1333,10 +1322,7 @@ class Run(RunClient):
             )
         name = name or get_base_filename(path)
         name = self._sanitize_filename(name)
-        ext = None
-        if os.path.isfile(path):
-            ext = get_path_extension(filepath=path)
-
+        ext = get_path_extension(filepath=path) if os.path.isfile(path) else None
         if step is not None:
             self._log_has_model()
             asset_path = get_asset_path(
@@ -1488,16 +1474,14 @@ class Run(RunClient):
         asset_rel_path = os.path.relpath(asset_path, self._artifacts_path)
         with tempfile.TemporaryDirectory() as d:
             path = os.path.join(d, name)
-            path = "{}.{}".format(path, content_type)
+            path = f"{path}.{content_type}"
             if content_type == V1ArtifactKind.CSV:
                 df.to_csv(path)
             elif content_type == V1ArtifactKind.HTML:
                 df.to_html(path)
             else:
                 raise ValueError(
-                    "The content_type `{}` is not supported "
-                    "by the method log_dataframe. "
-                    "This method supports `csv` or `html`.".format(content_type)
+                    f"The content_type `{content_type}` is not supported by the method log_dataframe. This method supports `csv` or `html`."
                 )
             df = events_processors.dataframe_path(
                 from_path=path,
@@ -1711,9 +1695,8 @@ class Run(RunClient):
         if not content:
             content = get_run_env()
 
-        rel_path = rel_path or "env.json"
         path = self._outputs_path
-        if rel_path:
+        if rel_path := rel_path or "env.json":
             path = os.path.join(path, rel_path)
 
         with open(os.path.join(path), "w") as env_file:

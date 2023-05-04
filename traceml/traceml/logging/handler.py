@@ -50,9 +50,7 @@ class PolyaxonHandler(logging.Handler):
         )
 
     def format_record(self, record):
-        message = ""
-        if record.msg:
-            message = record.msg % record.args
+        message = record.msg % record.args if record.msg else ""
         return V1Log.process_log_line(
             value=message,
             timestamp=to_datetime(record.created),

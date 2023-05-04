@@ -35,14 +35,10 @@ class EventWriter:
 
     def _get_event_path(self, kind: str, name: str) -> str:
         if self._events_backend == self.EVENTS_BACKEND:
-            return os.path.join(
-                self._run_path, self._events_backend, kind, "{}.plx".format(name)
-            )
+            return os.path.join(self._run_path, self._events_backend, kind, f"{name}.plx")
         if self._events_backend == self.RESOURCES_BACKEND:
-            return os.path.join(
-                self._run_path, self._events_backend, kind, "{}.plx".format(name)
-            )
-        raise ValueError("Unrecognized backend {}".format(self._events_backend))
+            return os.path.join(self._run_path, self._events_backend, kind, f"{name}.plx")
+        raise ValueError(f"Unrecognized backend {self._events_backend}")
 
     def _init_events(self, events_spec: LoggedEventListSpec):
         event_path = self._get_event_path(kind=events_spec.kind, name=events_spec.name)
@@ -59,7 +55,7 @@ class EventWriter:
 
     def _events_to_files(self, events: List[LoggedEventSpec]):
         for event in events:
-            file_name = "{}.{}".format(event.kind, event.name)
+            file_name = f"{event.kind}.{event.name}"
             if file_name in self._files:
                 self._files[file_name].events.append(event.event)
             else:
@@ -108,13 +104,13 @@ class BaseFileWriter:
 
     def add_event(self, event: LoggedEventSpec):
         if not isinstance(event, LoggedEventSpec):
-            raise TypeError("Expected an LoggedEventSpec, " " but got %s" % type(event))
+            raise TypeError(f"Expected an LoggedEventSpec,  but got {type(event)}")
         self._async_writer.write(event)
 
     def add_events(self, events: List[LoggedEventSpec]):
         for e in events:
             if not isinstance(e, LoggedEventSpec):
-                raise TypeError("Expected an LoggedEventSpec, " " but got %s" % type(e))
+                raise TypeError(f"Expected an LoggedEventSpec,  but got {type(e)}")
         self._async_writer.write(events)
 
     def flush(self):

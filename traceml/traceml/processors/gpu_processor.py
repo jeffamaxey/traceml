@@ -42,9 +42,9 @@ def query_gpu(handle_idx: int, handle: any) -> Dict:
     utilization = pynvml.nvmlDeviceGetUtilizationRates(handle)
 
     return {
-        "gpu_{}_memory_free".format(handle_idx): int(memory.free),
-        "gpu_{}_memory_used".format(handle_idx): int(memory.used),
-        "gpu_{}_utilization".format(handle_idx): utilization.gpu,
+        f"gpu_{handle_idx}_memory_free": int(memory.free),
+        f"gpu_{handle_idx}_memory_used": int(memory.used),
+        f"gpu_{handle_idx}_utilization": utilization.gpu,
     }
 
 

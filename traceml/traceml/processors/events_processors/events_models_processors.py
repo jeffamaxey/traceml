@@ -51,7 +51,7 @@ def _model_to_str(model):
     try:
         return str(model), filetype
     except Exception as e:
-        logger.warning("Could not convert model to a string. Error: %s" % e)
+        logger.warning(f"Could not convert model to a string. Error: {e}")
 
 
 def model_to_str(model):

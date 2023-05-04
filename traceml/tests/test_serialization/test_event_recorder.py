@@ -32,9 +32,10 @@ class TestEventWriter(BaseTestCase):
     def test_event_file(self):
         run_path = tempfile.mkdtemp()
         ew = EventWriter(run_path=run_path, backend=EventWriter.EVENTS_BACKEND)
-        assert ew._get_event_path(
-            kind="kind", name="name"
-        ) == "{}/events/kind/name.plx".format(run_path)
+        assert (
+            ew._get_event_path(kind="kind", name="name")
+            == f"{run_path}/events/kind/name.plx"
+        )
 
     def test_init_events(self):
         events = LoggedEventListSpec(name="test", kind="metric", events=[])
@@ -95,7 +96,7 @@ class TestEventWriter(BaseTestCase):
             new_event_file = ew._get_event_path(kind=event.kind, name=event.name)
             assert os.path.exists(new_event_file) is True
 
-        assert len(os.listdir(run_path + "/events")) == 3
+        assert len(os.listdir(f"{run_path}/events")) == 3
 
         # Check the queues
         assert len(ew._files) == 4
@@ -138,8 +139,8 @@ class TestEventWriter(BaseTestCase):
         ew.write(events)
         ew.close()
 
-        assert len(os.listdir(run_path + "/events")) == 1
-        assert len(os.listdir(run_path + "/events/metric")) == 1
+        assert len(os.listdir(f"{run_path}/events")) == 1
+        assert len(os.listdir(f"{run_path}/events/metric")) == 1
 
         results = V1Events.read(
             name="test",
@@ -173,8 +174,8 @@ class TestEventWriter(BaseTestCase):
         ew.write(new_events)
         ew.close()
 
-        assert len(os.listdir(run_path + "/events")) == 2  # metric and html
-        assert len(os.listdir(run_path + "/events/metric")) == 2
+        assert len(os.listdir(f"{run_path}/events")) == 2
+        assert len(os.listdir(f"{run_path}/events/metric")) == 2
 
         results = V1Events.read(
             name="test",
@@ -194,11 +195,11 @@ class TestEventWriter(BaseTestCase):
 class TestEventFileWriter(BaseTestCase):
     def test_event_file_writer_initializes_paths(self):
         some_path = tempfile.mkdtemp()
-        assert os.path.exists(some_path + "/run_uid") is False
-        EventFileWriter(some_path + "/run_uid")
-        assert os.path.exists(some_path + "/run_uid") is True
-        assert os.path.exists(some_path + "/run_uid/events") is True
-        assert os.path.exists(some_path + "/run_uid/assets") is True
+        assert os.path.exists(f"{some_path}/run_uid") is False
+        EventFileWriter(f"{some_path}/run_uid")
+        assert os.path.exists(f"{some_path}/run_uid") is True
+        assert os.path.exists(f"{some_path}/run_uid/events") is True
+        assert os.path.exists(f"{some_path}/run_uid/assets") is True
 
     def test_event_file_writer(self):
         run_path = tempfile.mkdtemp()
@@ -214,11 +215,11 @@ class TestEventFileWriter(BaseTestCase):
         for e in events:
             ew.add_event(e)
         ew.flush()
-        assert len(os.listdir(run_path + "/events")) == 1
-        assert len(os.listdir(run_path + "/events/metric")) == 1
+        assert len(os.listdir(f"{run_path}/events")) == 1
+        assert len(os.listdir(f"{run_path}/events/metric")) == 1
 
         results = V1Events.read(
-            name="test", kind="metric", data=run_path + "/events/metric/test.plx"
+            name="test", kind="metric", data=f"{run_path}/events/metric/test.plx"
         )
         assert results.name == "test"
         assert results.kind == "metric"
@@ -245,11 +246,11 @@ class TestEventFileWriter(BaseTestCase):
             ew.add_event(e)
         ew.flush()
 
-        assert len(os.listdir(run_path + "/events")) == 2  # metric and html
-        assert len(os.listdir(run_path + "/events/metric")) == 2
+        assert len(os.listdir(f"{run_path}/events")) == 2
+        assert len(os.listdir(f"{run_path}/events/metric")) == 2
 
         results = V1Events.read(
-            name="test", kind="metric", data=run_path + "/events/metric/test.plx"
+            name="test", kind="metric", data=f"{run_path}/events/metric/test.plx"
         )
         assert results.name == "test"
         assert results.kind == "metric"
@@ -272,11 +273,11 @@ class TestEventFileWriter(BaseTestCase):
         ]
         ew.add_events(events)
         ew.flush()
-        assert len(os.listdir(run_path + "/events")) == 1
-        assert len(os.listdir(run_path + "/events/metric")) == 1
+        assert len(os.listdir(f"{run_path}/events")) == 1
+        assert len(os.listdir(f"{run_path}/events/metric")) == 1
 
         results = V1Events.read(
-            name="test", kind="metric", data=run_path + "/events/metric/test.plx"
+            name="test", kind="metric", data=f"{run_path}/events/metric/test.plx"
         )
         assert results.name == "test"
         assert results.kind == "metric"
@@ -298,11 +299,11 @@ class TestEventFileWriter(BaseTestCase):
         for e in events:
             ew.add_event(e)
         ew.close()
-        assert len(os.listdir(run_path + "/events")) == 1
-        assert len(os.listdir(run_path + "/events/metric")) == 1
+        assert len(os.listdir(f"{run_path}/events")) == 1
+        assert len(os.listdir(f"{run_path}/events/metric")) == 1
 
         results = V1Events.read(
-            name="test", kind="metric", data=run_path + "/events/metric/test.plx"
+            name="test", kind="metric", data=f"{run_path}/events/metric/test.plx"
         )
         assert results.name == "test"
         assert results.kind == "metric"
@@ -331,11 +332,11 @@ class TestEventFileWriter(BaseTestCase):
             ew.add_event(e)
         ew.close()
 
-        assert len(os.listdir(run_path + "/events")) == 2  # metric and html
-        assert len(os.listdir(run_path + "/events/metric")) == 2
+        assert len(os.listdir(f"{run_path}/events")) == 2
+        assert len(os.listdir(f"{run_path}/events/metric")) == 2
 
         results = V1Events.read(
-            name="test", kind="metric", data=run_path + "/events/metric/test.plx"
+            name="test", kind="metric", data=f"{run_path}/events/metric/test.plx"
         )
         assert results.name == "test"
         assert results.kind == "metric"
@@ -359,11 +360,11 @@ class TestEventFileWriter(BaseTestCase):
         for e in events:
             ew.add_event(e)
         ew.close()
-        assert len(os.listdir(run_path + "/events")) == 1
-        assert len(os.listdir(run_path + "/events/metric")) == 1
+        assert len(os.listdir(f"{run_path}/events")) == 1
+        assert len(os.listdir(f"{run_path}/events/metric")) == 1
 
         results = V1Events.read(
-            name="test", kind="metric", data=run_path + "/events/metric/test.plx"
+            name="test", kind="metric", data=f"{run_path}/events/metric/test.plx"
         )
         assert results.name == "test"
         assert results.kind == "metric"
@@ -383,7 +384,7 @@ class TestEventFileWriter(BaseTestCase):
         run_path = tempfile.mkdtemp()
         ew = EventFileWriter(run_path)
         ew.close()
-        assert len(os.listdir(run_path + "/events")) == 0
+        assert len(os.listdir(f"{run_path}/events")) == 0
 
 
 @pytest.mark.serialization_mark
@@ -398,10 +399,10 @@ class TestEventAsyncManager(BaseTestCase):
         )
         ew.write(event)
         ew.close()
-        assert len(os.listdir(run_path + "/events")) == 1
-        assert len(os.listdir(run_path + "/events/metric")) == 1
+        assert len(os.listdir(f"{run_path}/events")) == 1
+        assert len(os.listdir(f"{run_path}/events/metric")) == 1
         results = V1Events.read(
-            name="test", kind="metric", data=run_path + "/events/metric/test.plx"
+            name="test", kind="metric", data=f"{run_path}/events/metric/test.plx"
         )
         assert results.name == "test"
         assert results.kind == "metric"
@@ -417,15 +418,15 @@ class TestEventAsyncManager(BaseTestCase):
             name="test", kind="metric", event=V1Event.make(step=13, metric=1.12)
         )
         repeat = 100
-        for i in range(repeat):
+        for _ in range(repeat):
             ew.write(event)
         ew.close()
 
-        assert len(os.listdir(run_path + "/events")) == 1
-        assert len(os.listdir(run_path + "/events/metric")) == 1
+        assert len(os.listdir(f"{run_path}/events")) == 1
+        assert len(os.listdir(f"{run_path}/events/metric")) == 1
 
         results = V1Events.read(
-            name="test", kind="metric", data=run_path + "/events/metric/test.plx"
+            name="test", kind="metric", data=f"{run_path}/events/metric/test.plx"
         )
         assert results.name == "test"
         assert results.kind == "metric"
@@ -442,14 +443,14 @@ class TestEventAsyncManager(BaseTestCase):
             name="test", kind="metric", event=V1Event.make(step=13, metric=1.12)
         )
         repeat = 10
-        for i in range(repeat):
+        for _ in range(repeat):
             ew.write(event)
         ew.close()
 
-        assert len(os.listdir(run_path + "/events")) == 1
-        assert len(os.listdir(run_path + "/events/metric")) == 1
+        assert len(os.listdir(f"{run_path}/events")) == 1
+        assert len(os.listdir(f"{run_path}/events/metric")) == 1
         results = V1Events.read(
-            name="test", kind="metric", data=run_path + "/events/metric/test.plx"
+            name="test", kind="metric", data=f"{run_path}/events/metric/test.plx"
         )
         assert results.name == "test"
         assert results.kind == "metric"
@@ -468,10 +469,10 @@ class TestEventAsyncManager(BaseTestCase):
         ew.write(event)
         ew.close()
 
-        assert len(os.listdir(run_path + "/events")) == 1
-        assert len(os.listdir(run_path + "/events/metric")) == 1
+        assert len(os.listdir(f"{run_path}/events")) == 1
+        assert len(os.listdir(f"{run_path}/events/metric")) == 1
         results = V1Events.read(
-            name="test", kind="metric", data=run_path + "/events/metric/test.plx"
+            name="test", kind="metric", data=f"{run_path}/events/metric/test.plx"
         )
         assert results.name == "test"
         assert results.kind == "metric"

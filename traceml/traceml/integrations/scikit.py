@@ -48,8 +48,8 @@ def _log_test_predictions(run, y_test, y_pred=None, nrows=1000):
     if len(y_pred.shape) == 2:
         df = pd.DataFrame()
         for j in range(y_pred.shape[1]):
-            df["y_test_output_{}".format(j)] = y_test[:, j]
-            df["y_pred_output_{}".format(j)] = y_pred[:, j]
+            df[f"y_test_output_{j}"] = y_test[:, j]
+            df[f"y_pred_output_{j}"] = y_pred[:, j]
         run.log_dataframe(df=df.head(nrows), name="test_predictions")
 
 
@@ -63,9 +63,7 @@ def _log_test_preds_proba(run, classifier, X_test, nrows=1000):
         y_pred_proba = classifier.predict_proba(X_test)
     except Exception as e:
         print(
-            "This classifier does not provide predictions probabilities. Error: {}".format(
-                e
-            )
+            f"This classifier does not provide predictions probabilities. Error: {e}"
         )
         return
 
@@ -114,7 +112,7 @@ def log_classifier(classifier, X_test, y_test, nrows=1000, run=None):
         precision_recall_fscore_support(y_test, y_pred),
     ):
         for i, value in enumerate(values):
-            results["{}_class_{}_test".format(metric_name, i)] = value
+            results[f"{metric_name}_class_{i}_test"] = value
     results["accuracy"] = accuracy_score(y_test, y_pred)
     results["f1"] = f1_score(y_pred, y_pred, average="weighted")
     run.log_metrics(**results)

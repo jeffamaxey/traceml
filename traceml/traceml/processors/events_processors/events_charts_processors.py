@@ -78,9 +78,7 @@ def mpl_plotly_chart(figure, close: bool = True) -> V1EventChart:
     except ImportError:
         logger.warning(MATPLOTLIB_ERROR_MESSAGE)
 
-    if module_type(figure, "matplotlib.figure.Figure"):
-        pass
-    else:
+    if not module_type(figure, "matplotlib.figure.Figure"):
         if figure == matplotlib.pyplot:
             figure = figure.gcf()
         elif not isinstance(figure, Figure):

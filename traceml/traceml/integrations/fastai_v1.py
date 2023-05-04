@@ -34,11 +34,10 @@ class Callback(TrackerCallback):
     def on_epoch_end(self, epoch, smooth_loss, last_metrics, **kwargs):
         if not self.run:
             return
-        metrics = {
-            name: stat
-            for name, stat in list(
+        metrics = dict(
+            list(
                 zip(self.learn.recorder.names, [epoch, smooth_loss] + last_metrics)
             )[1:]
-        }
+        )
 
         self.run.log_metrics(**metrics)

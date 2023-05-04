@@ -69,8 +69,8 @@ class V1Log(BaseConfig, polyaxon_sdk.V1Log):
 
         if not timestamp:
             value, timestamp = timestamp_search_regex(ISO_DATETIME_REGEX, value)
-            if not timestamp:
-                value, timestamp = timestamp_search_regex(DATETIME_REGEX, value)
+        if not timestamp:
+            value, timestamp = timestamp_search_regex(DATETIME_REGEX, value)
         if isinstance(timestamp, str):
             try:
                 timestamp = parse_datetime(timestamp)
@@ -119,7 +119,7 @@ class V1Logs(BaseConfig, polyaxon_sdk.V1Logs):
         return V1Log.SEPARATOR.join(V1Log.REDUCED_ATTRIBUTES)
 
     def to_csv(self):
-        _logs = ["\n{}".format(e.to_csv()) for e in self.logs if e.value]
+        _logs = [f"\n{e.to_csv()}" for e in self.logs if e.value]
         return "".join(_logs)
 
     @classmethod

@@ -69,19 +69,20 @@ class Callback(baseCallback):
     @client_handler(check_no_op=True)
     def after_batch(self):
         # log loss and opt.hypers
-        if self.training:
-            self._plx_step += 1
-            metrics = {}
-            if hasattr(self, "smooth_loss"):
-                metrics["smooth_loss"] = to_detach(self.smooth_loss.clone())
-            if hasattr(self, "loss"):
-                metrics["raw_loss"] = to_detach(self.loss.clone())
-            if hasattr(self, "train_iter"):
-                metrics["train_iter"] = self.train_iter
-            for i, h in enumerate(self.learn.opt.hypers):
-                for k, v in h.items():
-                    metrics[f"hypers_{k}"] = v
-            self.plx_run.log_metrics(step=self._plx_step, **metrics)
+        if not self.training:
+            return
+        self._plx_step += 1
+        metrics = {}
+        if hasattr(self, "smooth_loss"):
+            metrics["smooth_loss"] = to_detach(self.smooth_loss.clone())
+        if hasattr(self, "loss"):
+            metrics["raw_loss"] = to_detach(self.loss.clone())
+        if hasattr(self, "train_iter"):
+            metrics["train_iter"] = self.train_iter
+        for h in self.learn.opt.hypers:
+            for k, v in h.items():
+                metrics[f"hypers_{k}"] = v
+        self.plx_run.log_metrics(step=self._plx_step, **metrics)
 
     @client_handler(check_no_op=True)
     def after_epoch(self):

@@ -81,10 +81,7 @@ def to_memory_bytes(mem_definition: Union[str, int, float]) -> int:
     mem_unit = mem_definition[-1:]
     mem_value = mem_definition[:-1]
     memory = _get_value(mem_unit, mem_value, fixed_point_unit_multiplier)
-    if memory is not None:
-        return memory
-
-    return 0
+    return memory if memory is not None else 0
 
 
 def to_unit_memory(number, precision: int = 2):
@@ -94,26 +91,26 @@ def to_unit_memory(number, precision: int = 2):
     number /= kb
 
     if number < 100:
-        return "{} Ki".format(round(number, precision))
+        return f"{round(number, precision)} Ki"
 
     number /= kb
     if number < 300:
-        return "{} Mi".format(round(number, precision))
+        return f"{round(number, precision)} Mi"
 
     number /= kb
     if number < 900:
-        return "{} Gi".format(round(number, precision))
+        return f"{round(number, precision)} Gi"
 
     number /= kb
     if number < 900:
-        return "{} Ti".format(round(number, precision))
+        return f"{round(number, precision)} Ti"
 
     number /= kb
     if number < 900:
-        return "{} Pi".format(round(number, precision))
+        return f"{round(number, precision)} Pi"
 
     number /= kb
-    return "{} Ei".format(round(number, precision))
+    return f"{round(number, precision)} Ei"
 
 
 def number_percentage_format(x, precision: int = None, use_comma: bool = False):
@@ -146,7 +143,7 @@ def to_percentage(
         else number_percentage_format(rounded, precision, use_comma)
     )
 
-    return "{}%".format(value)
+    return f"{value}%"
 
 
 def format_sizeof(num, suffix="B"):

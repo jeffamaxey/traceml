@@ -41,7 +41,7 @@ from traceml.processors.events_processors import (
 class TestEventValues(BaseTestCase):
     def setUp(self):
         self.run_path = tempfile.mkdtemp()
-        self.asset_path = self.run_path + "/asset"
+        self.asset_path = f"{self.run_path}/asset"
 
     def test_uint8_image(self):
         """Tests that uint8 image (pixel values in [0, 255]) is not changed"""
@@ -65,8 +65,8 @@ class TestEventValues(BaseTestCase):
         green_uint8 = np.array([[[0, 255, 0]]], dtype="uint8")
         green_float32 = np.array([[[0, 1, 0]]], dtype="float32")
 
-        a = image(asset_path=self.run_path + "/asset1", data=green_uint8)
-        b = image(asset_path=self.run_path + "/asset2", data=green_float32)
+        a = image(asset_path=f"{self.run_path}/asset1", data=green_uint8)
+        b = image(asset_path=f"{self.run_path}/asset2", data=green_float32)
         self.assertEqual(
             Image.open(io.BytesIO(open(a.path, "br").read())),
             Image.open(io.BytesIO(open(b.path, "br").read())),
@@ -143,7 +143,7 @@ class TestEventValues(BaseTestCase):
         assert os.path.exists(self.asset_path) is True
 
     def test_video(self):
-        asset_path = self.asset_path + ".gif"
+        asset_path = f"{self.asset_path}.gif"
         event = video(asset_path=asset_path, tensor=tensor_np(shape=(4, 3, 1, 8, 8)))
         assert event.path == asset_path
         assert os.path.exists(asset_path) is True
